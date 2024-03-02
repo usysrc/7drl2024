@@ -2,18 +2,18 @@
 --  Game
 --
 
-local Gamestate   = require("libs.hump.gamestate")
-local Timer       = require("libs.hump.timer")
-local Hero        = require("src.entities.Hero")
-local Goblin      = require("src.entities.Goblin")
-local Win         = require("src.states.Win")
-local SpriteMap   = require("src.entities.SpriteMap")
-local World       = require("src.entities.World")
-local Spawner     = require("src.jobs.spawner")
-local Game        = Gamestate.new()
-local DijkstraMap = require("src.jobs.dijkstra")
+local Gamestate = require("libs.hump.gamestate")
+local Timer     = require("libs.hump.timer")
+local Hero      = require("src.entities.Hero")
+local Goblin    = require("src.entities.Goblin")
+local Win       = require("src.states.Win")
+local SpriteMap = require("src.entities.SpriteMap")
+local World     = require("src.entities.World")
+local Spawner   = require("src.jobs.spawner")
+local Game      = Gamestate.new()
+local Dijkstra  = require("src.jobs.dijkstra")
 
-local canvas      = love.graphics.newCanvas()
+local canvas    = love.graphics.newCanvas()
 canvas:setFilter("nearest", "nearest")
 function Game:enter()
 	SpriteMap.clear()
@@ -23,6 +23,10 @@ function Game:enter()
 	World.hero = hero
 
 	add(World.jobs, Spawner())
+
+	local dijkstra = Dijkstra()
+	add(World.jobs, dijkstra)
+	World.dijkstra = dijkstra
 
 	Game:drawToSpriteMap()
 end
@@ -58,7 +62,6 @@ function Game:drawToSpriteMap()
 end
 
 function Game:turn()
-	DijkstraMap:update()
 	for job in all(World.jobs) do
 		job:turn()
 	end

@@ -33,9 +33,13 @@ local Hero   = function()
 
     hero.keypressed = function(self, key)
         local dx, dy = self:moveInput(key)
-
         local tx = hero.x + dx
         local ty = hero.y + dy
+
+        -- TODO: insert acutal boundaries
+        if tx <= 0 or ty <= 0 or tx > 32 or ty > 32 then
+            return
+        end
 
         if World.map:isBlocked(tx, ty) then
             return

@@ -2,6 +2,7 @@ local World = require("src.entities.World")
 local Goblin = require("src.entities.Goblin")
 
 local Spawner = function()
+    ---@class Spawner
     local spawner = {}
     spawner.turn = function()
         if math.random() < 0.1 then

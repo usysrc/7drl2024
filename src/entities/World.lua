@@ -9,6 +9,7 @@ local World = function()
     world.name = "1234"
     world.jobs = {}
     world.hero = nil ---@type Hero
+    world.dijkstra = nil ---@type Dijkstra
 
     world.reset = function()
         world.objects = {}

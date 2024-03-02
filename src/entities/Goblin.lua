@@ -1,8 +1,7 @@
-local Entity      = require "src.entities.Entity"
-local World       = require "src.entities.World"
-local DijkstraMap = require "src.jobs.dijkstra"
+local Entity = require "src.entities.Entity"
+local World  = require "src.entities.World"
 
-local Goblin      = function()
+local Goblin = function()
     ---@class Goblin:Entity
     local goblin = Entity()
     goblin.name = "goblin"
@@ -16,14 +15,14 @@ local Goblin      = function()
         if math.random() < 0.5 then return end
         local dx, dy = 0, 0
         local smallest = math.huge
-        local possbiles = {
+        local possibilities = {
             { i = -1, j = 0 },
             { i = 1,  j = 0 },
             { i = 0,  j = 1 },
             { i = 0,  j = -1 },
         }
-        for pos in all(possbiles) do
-            local num = DijkstraMap.get(pos.i + goblin.x, pos.j + goblin.y)
+        for pos in all(possibilities) do
+            local num = World.dijkstra.get(pos.i + goblin.x, pos.j + goblin.y)
             if num and num < smallest then
                 smallest = num
                 dx, dy = pos.i, pos.j
