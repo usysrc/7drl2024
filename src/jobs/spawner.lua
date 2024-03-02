@@ -5,7 +5,7 @@ local Spawner = function()
     local spawner = {}
     spawner.turn = function()
         if math.random() < 0.1 then
-            local x, y = math.random(20, 30), math.random(20, 30)
+            local x, y = math.random(1, 12), math.random(1, 12)
             local blocked = World:getObjectAt(x, y)
             if blocked then return end
             local goblin = Goblin()

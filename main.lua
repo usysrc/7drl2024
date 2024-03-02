@@ -8,6 +8,7 @@ local Gamestate = require("libs.hump.gamestate")
 
 -- Initialization
 function love.load()
+	love.graphics.setFont(love.graphics.newFont("fonts/super.ttf", 16))
 	math.randomseed(os.time())
 	love.graphics.setDefaultFilter("nearest", "nearest")
 	Gamestate.registerEvents()

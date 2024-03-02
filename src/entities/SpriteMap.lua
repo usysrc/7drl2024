@@ -1,6 +1,6 @@
 local imgData = love.image.newImageData("img/tiles.png")
 
-local tileWidth, tileHeight = 12, 12
+local tileWidth, tileHeight = 8, 8
 local tilesPerRow = 16
 local numberOfTiles = 255
 local spriteBatchWidth = 87
@@ -8,9 +8,9 @@ local spriteBatchHeight = 25
 
 -- make background transparent
 imgData:mapPixel(function(x, y, r, g, b, a)
-    if r == 1 and g == 0 and b == 1 then
-        return 1, 1, 1, 0
-    end
+    --if r == 253 / 255 and g == 241 / 255 and b == 233 / 255 then
+    --    return 1, 1, 1, 0
+    --end
     return r, g, b, a
 end)
 local img = love.graphics.newImage(imgData)
@@ -56,7 +56,7 @@ local clear = function()
         for j = 0, h do
             map[i][j] = 0
             spritebatch:setColor(255, 255, 255)
-            spritebatch:set(idmap[i][j], quads[map[i][j]], i * 12, j * 12)
+            spritebatch:set(idmap[i][j], quads[map[i][j]], i * tileWidth, j * tileHeight)
         end
     end
 end
@@ -77,7 +77,7 @@ end
 local setChar = function(char, x, y, color)
     map[x][y] = char
     spritebatch:setColor(color or { 0, 0, 0 })
-    spritebatch:set(idmap[x][y], quads[map[x][y]], x * 12, y * 12)
+    spritebatch:set(idmap[x][y], quads[map[x][y]], x * tileWidth, y * tileHeight)
 end
 
 local set = function(str, x, y, color)
@@ -101,6 +101,7 @@ end
 return {
     clear = clear,
     set = set,
+    setChar = setChar,
     write = write,
     draw = draw,
 }

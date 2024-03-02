@@ -1,13 +1,14 @@
 local Entity = require "src.entities.Entity"
 local World  = require "src.entities.World"
 
-
-local Hero = function()
+local Hero   = function()
+    ---@class Hero:Entity
     local hero = Entity()
+    hero.name = "hero"
     hero.hp = 32
-    hero.char = "A"
-    hero.x = 32
-    hero.y = 32
+    hero.char = 2
+    hero.x = 12
+    hero.y = 12
 
     hero.update = function(self)
 
