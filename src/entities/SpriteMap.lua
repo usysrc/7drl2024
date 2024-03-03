@@ -8,9 +8,9 @@ local spriteBatchHeight = 25
 
 -- make background transparent
 imgData:mapPixel(function(x, y, r, g, b, a)
-    --if r == 253 / 255 and g == 241 / 255 and b == 233 / 255 then
-    --    return 1, 1, 1, 0
-    --end
+    if r == 0 and g == 0 and b == 0 then
+        return 1, 1, 1, 0
+    end
     return r, g, b, a
 end)
 local img = love.graphics.newImage(imgData)
@@ -104,4 +104,10 @@ return {
     setChar = setChar,
     write = write,
     draw = draw,
+    drawSingle = function(char, x, y, color)
+        love.graphics.setColor(color or { 1, 1, 1 })
+        love.graphics.draw(img, quads[char], x * tileWidth, y * tileHeight)
+    end,
+    tileWidth = tileWidth,
+    tileHeight = tileHeight
 }

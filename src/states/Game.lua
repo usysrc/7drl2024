@@ -40,15 +40,25 @@ end
 
 function Game:draw()
 	love.graphics.setCanvas(canvas)
-	love.graphics.clear(255 / 255, 241 / 255, 232 / 255, 1)
+	love.graphics.clear(0, 0, 0, 1)
 	SpriteMap.draw()
 
+	for obj in all(World.objects) do
+		obj:drawOverlay()
+	end
 	love.graphics.setCanvas()
 	love.graphics.setColor(1, 1, 1)
 	love.graphics.draw(canvas, 0, 0, 0, 3, 3)
 	love.graphics.setColor(1, 1, 1)
 
+
 	love.graphics.print("HP: " .. World.hero.hp, 0, 100)
+
+	local i = 0
+	for itemName, itemStack in pairs(World.hero.inventory.itemStacks) do
+		i = i + 1
+		love.graphics.print(itemName .. " x" .. itemStack.count, 0, 100 + i * 16)
+	end
 end
 
 function Game:drawToSpriteMap()
@@ -76,9 +86,14 @@ function Game:mousepressed(x, y, button)
 end
 
 function Game:keypressed(key)
+	local skipTurn = false
 	for obj in all(World.objects) do
-		obj:keypressed(key)
+		local skip = obj:keypressed(key)
+		if skip then
+			skipTurn = true
+		end
 	end
+	if skipTurn then return end
 	Game:turn()
 end
 

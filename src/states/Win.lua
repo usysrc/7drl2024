@@ -1,5 +1,5 @@
 --
---  Game
+--  Win
 --
 
 local Gamestate = require("libs.hump.gamestate")

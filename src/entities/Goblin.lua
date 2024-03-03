@@ -1,15 +1,27 @@
-local Entity = require "src.entities.Entity"
-local World  = require "src.entities.World"
+local Entity    = require "src.entities.Entity"
+local World     = require "src.entities.World"
+local SpriteMap = require "src.entities.SpriteMap"
 
-local Goblin = function()
+local Goblin    = function()
     ---@class Goblin:Entity
     local goblin = Entity()
     goblin.name = "goblin"
-    goblin.hp = 1
+    goblin.maxhp = 5
+    goblin.hp = goblin.maxhp
     goblin.char = 3
     goblin.color = { 1, 1, 1 }
     goblin.x = 24
     goblin.y = 28
+
+    goblin:register("death", function(self)
+        World.map:set(self.x, self.y, {
+            draw = function()
+                SpriteMap.setChar(18, self.x, self.y, { 1, 1, 1 })
+            end,
+            blocked = true,
+            pickup = true,
+        })
+    end)
 
     goblin.turn = function(self)
         if math.random() < 0.5 then return end
