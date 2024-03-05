@@ -1,5 +1,6 @@
 local imgData = love.image.newImageData("img/tiles.png")
 
+local dirty = true
 local tileWidth, tileHeight = 8, 8
 local tilesPerRow = 16
 local numberOfTiles = 255
@@ -23,7 +24,7 @@ for x = 0, numberOfTiles do
         img:getHeight())
 end
 
-local w, h = 86, 49
+local w, h = 40, 49
 local map = {}
 local idmap = {}
 for i = 0, w do
@@ -37,12 +38,14 @@ for i = 0, w do
 end
 
 local updateSpriteMap = function()
+    print("updating")
     for i = 0, w do
         for j = 0, h do
             spritebatch:setColor(255, 255, 255)
             spritebatch:set(idmap[i][j], quads[map[i][j]], i * tileWidth, j * tileHeight)
         end
     end
+    dirty = false
 end
 
 updateSpriteMap()
@@ -109,5 +112,8 @@ return {
         love.graphics.draw(img, quads[char], x * tileWidth, y * tileHeight)
     end,
     tileWidth = tileWidth,
-    tileHeight = tileHeight
+    tileHeight = tileHeight,
+    width = w,
+    height = h,
+    dirty = dirty,
 }

@@ -1,17 +1,20 @@
 local World = require("src.entities.World")
-local Goblin = require("src.entities.Goblin")
+local Feuxdeux = require("src.entities.Feuxdeux")
+local SpriteMap = require("src.entities.SpriteMap")
 
 local Spawner = function()
     ---@class Spawner
     local spawner = {}
     spawner.turn = function()
         if math.random() < 0.1 then
-            local x, y = math.random(1, 12), math.random(1, 12)
+            local x, y = math.random(11, SpriteMap.width - 11), math.random(1, SpriteMap.height)
             local blocked = World:getObjectAt(x, y)
             if blocked then return end
-            local goblin = Goblin()
-            add(World.objects, goblin)
-            goblin.x, goblin.y = x, y
+            local tile = World.map:get(x, y)
+            if tile and tile.blocked then return end
+            local ent = Feuxdeux()
+            add(World.objects, ent)
+            ent.x, ent.y = x, y
         end
     end
     return spawner

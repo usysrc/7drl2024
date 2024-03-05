@@ -1,3 +1,4 @@
+local SpriteMap = require "src.entities.SpriteMap"
 --
 -- Map Class
 --
@@ -11,6 +12,7 @@ local Map = function()
 			self.data = {}
 		end,
 		set = function(self, i, j, what)
+			SpriteMap.dirty = true
 			self.data[i .. "," .. j] = what
 		end,
 		get = function(self, i, j)

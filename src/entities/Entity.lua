@@ -17,7 +17,7 @@ local Entity = function()
     entity.events = {}
 
     entity.draw = function(self)
-        SpriteMap.setChar(self.char, self.x, self.y, self.color)
+        -- SpriteMap.setChar(self.char, self.x, self.y, self.color)
     end
 
     entity.register = function(self, what, fn)
@@ -35,12 +35,14 @@ local Entity = function()
     end
 
     entity.drawOverlay = function(self)
+        SpriteMap.drawSingle(self.char, self.x, self.y, { 1, 1, 1 })
         love.graphics.setColor(1, 0, 0)
         love.graphics.rectangle("fill", self.x * SpriteMap.tileWidth, self.y * SpriteMap.tileHeight - 2,
             SpriteMap.tileWidth * (self.hp / self.maxhp), 2)
     end
 
-    entity.takeDamage = function(self, dmg)
+    entity.takeDamage = function(self, dmg, other)
+        local logline = other.name .. " hits the " .. self.name .. " for " .. dmg .. " damage."
         self.hp = self.hp - (dmg or 0)
         if self.hp <= 0 then
             if self.name == "hero" then
@@ -49,7 +51,9 @@ local Entity = function()
             entity:emit("death")
             self.alive = false
             del(World.objects, self)
+            logline = logline .. "The " .. self.name .. " dies."
         end
+        add(World.log, logline)
     end
 
     entity.update = function() end

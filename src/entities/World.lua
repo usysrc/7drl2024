@@ -1,7 +1,8 @@
-local Map = require "src.entities.Map"
+local Map       = require "src.entities.Map"
 local SpriteMap = require "src.entities.SpriteMap"
+local Tiles     = require "src.entities.Tiles"
 
-local World = function()
+local World     = function()
     local world = {}
 
     world.objects = {} ---@type Entity[]
@@ -10,6 +11,8 @@ local World = function()
     world.jobs = {}
     world.hero = nil ---@type Hero
     world.dijkstra = nil ---@type Dijkstra
+    world.log = {}
+    world.camera = nil
 
     world.reset = function()
         world.objects = {}
@@ -26,21 +29,29 @@ local World = function()
         end
     end
 
-    world.generateMap = function(self)
-        for i = 1, 32 do
-            for j = 1, 32 do
-                if math.random() < 0.1 then
-                    self.map:set(i, j, {
-                        draw = function()
-                            SpriteMap.setChar(50, i, j, { 1, 1, 1 })
-                        end,
-                        blocked = true,
-                    })
+    world.generateRoute = function(self)
+        local doors = {}
+        for j = 0, SpriteMap.height do
+            doors[j] = math.random(12, SpriteMap.width - 12)
+        end
+        for i = 0, SpriteMap.width do
+            for j = 0, SpriteMap.height do
+                if j % 8 == 0 and j < SpriteMap.height - 5 and i ~= doors[j] and i + 1 ~= doors[j] then
+                    self.map:set(i, j, Tiles.ledge(i, j))
+                end
+                if i == doors[j] or i + 1 == doors[j] then
+                    self.map:set(i, j, Tiles.tallgrass(i, j))
+                end
+                if i < 10 or i > SpriteMap.width - 10 then
+                    self.map:set(i, j, Tiles.grass(i, j))
+                end
+                if i == 10 or i == SpriteMap.width - 10 then
+                    self.map:set(i, j, Tiles.stone(i, j))
                 end
             end
         end
     end
-    world:generateMap()
+    world:generateRoute()
 
     return world
 end

@@ -12,11 +12,15 @@ local World     = require("src.entities.World")
 local Spawner   = require("src.jobs.spawner")
 local Game      = Gamestate.new()
 local Dijkstra  = require("src.jobs.dijkstra")
+local Camera    = require("libs.hump.camera")
 
 local canvas    = love.graphics.newCanvas()
+local zoom      = 2
 canvas:setFilter("nearest", "nearest")
 function Game:enter()
 	SpriteMap.clear()
+
+	World.camera = Camera()
 
 	local hero = Hero()
 	add(World.objects, hero)
@@ -32,6 +36,8 @@ function Game:enter()
 end
 
 function Game:update(dt)
+	World.camera.x = World.hero.x * SpriteMap.tileWidth + love.graphics.getWidth() / (2 * zoom)
+	World.camera.y = World.hero.y * SpriteMap.tileHeight + love.graphics.getHeight() / (2 * zoom)
 	Timer.update(dt)
 	for obj in all(World.objects) do
 		obj:update()
@@ -40,20 +46,33 @@ end
 
 function Game:draw()
 	love.graphics.setCanvas(canvas)
+	World.camera:attach()
 	love.graphics.clear(0, 0, 0, 1)
 	SpriteMap.draw()
 
 	for obj in all(World.objects) do
 		obj:drawOverlay()
 	end
+	World.camera:detach()
 	love.graphics.setCanvas()
 	love.graphics.setColor(1, 1, 1)
-	love.graphics.draw(canvas, 0, 0, 0, 3, 3)
+	love.graphics.draw(canvas, 0, 0, 0, zoom, zoom)
 	love.graphics.setColor(1, 1, 1)
 
 
-	love.graphics.print("HP: " .. World.hero.hp, 0, 100)
 
+	love.graphics.setColor(0, 0, 0)
+	love.graphics.rectangle("fill", 0, love.graphics.getHeight() - 96, love.graphics.getWidth(), 96)
+	love.graphics.setColor(1, 1, 1)
+	for i = 0, 4 do
+		local log = World.log[#World.log - i]
+		if log then
+			love.graphics.print(log, 0, love.graphics.getHeight() - 96 + i * 16)
+		end
+	end
+
+	love.graphics.print("HP: " .. World.hero.hp, 0, 100)
+	love.graphics.print("Route 1", love.graphics.getWidth() / 2, 0)
 	local i = 0
 	for itemName, itemStack in pairs(World.hero.inventory.itemStacks) do
 		i = i + 1
@@ -78,7 +97,7 @@ function Game:turn()
 	for obj in all(World.objects) do
 		obj:turn()
 	end
-	Game:drawToSpriteMap()
+	if SpriteMap.dirty then Game:drawToSpriteMap() end
 end
 
 function Game:mousepressed(x, y, button)

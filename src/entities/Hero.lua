@@ -7,10 +7,11 @@ local Hero      = function()
     ---@class Hero:Entity
     local hero = Entity()
     hero.name = "hero"
-    hero.hp = 32
+    hero.maxhp = 32
+    hero.hp = hero.maxhp
     hero.char = 2
-    hero.x = 12
-    hero.y = 12
+    hero.x = SpriteMap.width / 2
+    hero.y = SpriteMap.height - 1
     hero.target = nil ---@type Entity
     hero.monsters = {}
 
@@ -57,12 +58,9 @@ local Hero      = function()
         return dx, dy
     end
 
-    local _draw = hero.draw
-    hero.draw = function(self)
-        _draw(self)
-    end
-
+    local _draw = hero.drawOverlay
     hero.drawOverlay = function(self)
+        _draw(self)
         if self.target and self.target.alive then
             SpriteMap.drawSingle(34, self.target.x, self.target.y, { 1, 1, 1 })
         end
@@ -96,9 +94,12 @@ local Hero      = function()
                 return
             end
             if math.random() < 0.5 then
+                add(World.log, "You catch a " .. self.target.name .. ".")
                 add(self.monsters, self.target)
                 del(World.objects, self.target)
                 self.target = nil
+            else
+                add(World.log, "The picoball misses the target!")
             end
         end
 
@@ -106,8 +107,7 @@ local Hero      = function()
         local tx = hero.x + dx
         local ty = hero.y + dy
 
-        -- TODO: insert acutal boundaries
-        if tx <= 0 or ty <= 0 or tx > 32 or ty > 32 then
+        if tx <= 0 or ty <= 0 or tx > SpriteMap.width or ty > SpriteMap.height then
             return
         end
 
@@ -124,7 +124,7 @@ local Hero      = function()
 
         local obj = World:getObjectAt(tx, ty, self)
         if obj then
-            obj:takeDamage(1)
+            obj:takeDamage(1, self)
             return
         end
 
