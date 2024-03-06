@@ -4,6 +4,10 @@ local vector    = require "libs.hump.vector"
 local SpriteMap = require "src.entities.SpriteMap"
 local Inventory = require "src.entities.Inventory"
 local Feuxdeux  = require "src.entities.Feuxdeux"
+local Gamestate = require "libs.hump.gamestate"
+local Inventar  = require "src.states.Inventar"
+local Items     = require "src.entities.Items"
+local Death     = require "src.states.Death"
 
 local Hero      = function()
     ---@class Hero:Entity
@@ -24,7 +28,8 @@ local Hero      = function()
     hero.inventory = Inventory()
 
     for i = 1, 3 do
-        hero.inventory.add({ name = "picoball", color = { 1, 1, 1 }, char = 18 })
+        hero.inventory.add(Items.Picoball())
+        hero.inventory.add(Items.Potion())
     end
 
     hero.moveInput = function(self, key)
@@ -44,9 +49,13 @@ local Hero      = function()
         return dx, dy
     end
 
-    local _draw = hero.drawOverlay
     hero.drawOverlay = function(self)
-        _draw(self)
+        SpriteMap.drawSingle(self.char, self.x, self.y, { 1, 1, 1 })
+        if self.activeMonster then
+            love.graphics.setColor(1, 0, 0)
+            love.graphics.rectangle("fill", self.x * SpriteMap.tileWidth, self.y * SpriteMap.tileHeight - 2,
+                SpriteMap.tileWidth * (self.activeMonster.hp / self.activeMonster.maxhp), 2)
+        end
         if self.target and self.target.alive then
             SpriteMap.drawSingle(34, self.target.x, self.target.y, { 1, 1, 1 })
         end
@@ -61,9 +70,28 @@ local Hero      = function()
             del(self.monsters, self.activeMonster)
             self.activeMonster = self.monsters[1]
         end
+        if not self.activeMonster then
+            Gamestate.switch(Death)
+        end
     end
 
     hero.keypressed = function(self, key)
+        -- hotkeys
+        if key == "1" then
+            self.inventory.selector = 1
+            self.inventory:keypressed("enter")
+            return
+        end
+        if key == "2" then
+            self.inventory.selector = 2
+            self.inventory:keypressed("enter")
+            return
+        end
+
+        if key == "i" or key == "e" then
+            Gamestate.push(Inventar)
+            return
+        end
         -- target an entity
         if key == "f" then
             local smallest, target = math.huge, nil
@@ -115,9 +143,9 @@ local Hero      = function()
         end
 
         if World.map:get(tx, ty) and World.map:get(tx, ty).pickup then
+            local item = World.map:get(tx, ty)
             World.map:set(tx, ty, nil)
-            -- TODO: don't hardcode the ball here
-            hero.inventory.add({ name = "picoball", color = { 1, 1, 1 }, char = 18 })
+            hero.inventory.add(item)
             return
         end
 

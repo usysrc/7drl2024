@@ -24,7 +24,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ]]
-   --
+--
 
 local function __NULL__() end
 
@@ -55,6 +55,12 @@ function GS.switch(to, ...)
 	assert(to ~= GS, "Can't call switch with colon operator")
 	; (stack[#stack].leave or __NULL__)(stack[#stack])
 	return change_state(0, to, ...)
+end
+
+function GS.peek(...)
+	assert(#stack > 1, "No more states to peek!")
+	local pre, to = stack[#stack], stack[#stack - 1]
+	return to
 end
 
 function GS.push(to, ...)

@@ -45,8 +45,8 @@ end
 
 function Game:draw()
 	love.graphics.setCanvas(canvas)
-	World.camera:attach()
 	love.graphics.clear(0, 0, 0, 1)
+	World.camera:attach()
 	SpriteMap.draw()
 
 	for obj in all(World.objects) do
@@ -70,12 +70,11 @@ function Game:draw()
 		end
 	end
 
-	love.graphics.print("HP: " .. World.hero.hp, 0, 100)
+	love.graphics.print("HP: " .. World.hero.hp, 0, 80)
+	love.graphics.print("Hotkeys: ", 0, 100)
 	love.graphics.print("Route 1", love.graphics.getWidth() / 2, 0)
-	local i = 0
-	for itemName, itemStack in pairs(World.hero.inventory.itemStacks) do
-		i = i + 1
-		love.graphics.print(itemName .. " x" .. itemStack.count, 0, 100 + i * 16)
+	for i, itemStack in pairs(World.hero.inventory.itemStacks) do
+		love.graphics.print(i .. ") " .. itemStack.item.name .. " x" .. itemStack.count, 0, 100 + i * 16)
 	end
 	love.graphics.print("Box: " .. #World.hero.box, love.graphics.getWidth() - 256, love.graphics.getHeight() - (96 + 16))
 

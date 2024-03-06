@@ -1,6 +1,7 @@
 local Entity    = require "src.entities.Entity"
 local World     = require "src.entities.World"
 local SpriteMap = require "src.entities.SpriteMap"
+local Items     = require "src.entities.Items"
 
 local Picomon   = function()
     ---@class Picomon:Entity
@@ -16,13 +17,8 @@ local Picomon   = function()
     picomon:register("death", function(self)
         -- drop a picoball
         -- TODO: drop other items here
-        World.map:set(self.x, self.y, {
-            draw = function()
-                SpriteMap.setChar(18, self.x, self.y, { 1, 1, 1 })
-            end,
-            blocked = true,
-            pickup = true,
-        })
+        local pos = { Items.Picoball, Items.Potion }
+        World.map:set(self.x, self.y, pos[math.random(1, #pos)](self.x, self.y))
     end)
 
     picomon.calculateDamage = function(self)
