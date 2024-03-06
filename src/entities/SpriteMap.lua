@@ -38,7 +38,6 @@ for i = 0, w do
 end
 
 local updateSpriteMap = function()
-    print("updating")
     for i = 0, w do
         for j = 0, h do
             spritebatch:setColor(255, 255, 255)

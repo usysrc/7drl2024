@@ -2,6 +2,8 @@ local Entity    = require "src.entities.Entity"
 local World     = require "src.entities.World"
 local vector    = require "libs.hump.vector"
 local SpriteMap = require "src.entities.SpriteMap"
+local Inventory = require "src.entities.Inventory"
+local Feuxdeux  = require "src.entities.Feuxdeux"
 
 local Hero      = function()
     ---@class Hero:Entity
@@ -12,33 +14,17 @@ local Hero      = function()
     hero.char = 2
     hero.x = SpriteMap.width / 2
     hero.y = SpriteMap.height - 1
-    hero.target = nil ---@type Entity
-    hero.monsters = {}
+    hero.target = nil ---@type Picomon
+    hero.monsters = {
+        Feuxdeux()
+    }
+    hero.box = {}
+    hero.activeMonster = hero.monsters[1] ---@type Picomon
 
-    local inventory = {}
-    inventory.itemStacks = {}
-    inventory.get = function(itemName)
-        local itemStack = inventory.itemStacks[itemName]
-        return itemStack
-    end
-    inventory.add = function(item)
-        if not inventory.itemStacks[item.name] then
-            inventory.itemStacks[item.name] = {
-                item = item,
-                count = 0
-            }
-        end
-        inventory.itemStacks[item.name].count = inventory.itemStacks[item.name].count + 1
-    end
+    hero.inventory = Inventory()
 
     for i = 1, 3 do
-        inventory.add({ name = "picoball", color = { 1, 1, 1 }, char = 18 })
-    end
-
-    hero.inventory = inventory
-
-    hero.update = function(self)
-
+        hero.inventory.add({ name = "picoball", color = { 1, 1, 1 }, char = 18 })
     end
 
     hero.moveInput = function(self, key)
@@ -63,6 +49,17 @@ local Hero      = function()
         _draw(self)
         if self.target and self.target.alive then
             SpriteMap.drawSingle(34, self.target.x, self.target.y, { 1, 1, 1 })
+        end
+    end
+
+    hero.takeDamage = function(self, dmg, other)
+        if not self.activeMonster then return end
+        self.activeMonster:takeDamage(dmg, other)
+        -- check for death
+        if self.activeMonster.hp <= 0 then
+            append(World.log, " Your " .. self.activeMonster.name .. " is dead.")
+            del(self.monsters, self.activeMonster)
+            self.activeMonster = self.monsters[1]
         end
     end
 
@@ -95,7 +92,13 @@ local Hero      = function()
             end
             if math.random() < 0.5 then
                 add(World.log, "You catch a " .. self.target.name .. ".")
-                add(self.monsters, self.target)
+                if #self.monsters >= 3 then
+                    append(World.log, " You put it in your pico-box.")
+                    add(self.box, self.target)
+                else
+                    add(self.monsters, self.target)
+                    if not self.activeMonster then self.activeMonster = self.target end
+                end
                 del(World.objects, self.target)
                 self.target = nil
             else
@@ -114,7 +117,7 @@ local Hero      = function()
         if World.map:get(tx, ty) and World.map:get(tx, ty).pickup then
             World.map:set(tx, ty, nil)
             -- TODO: don't hardcode the ball here
-            inventory.add({ name = "picoball", color = { 1, 1, 1 }, char = 18 })
+            hero.inventory.add({ name = "picoball", color = { 1, 1, 1 }, char = 18 })
             return
         end
 
@@ -124,7 +127,13 @@ local Hero      = function()
 
         local obj = World:getObjectAt(tx, ty, self)
         if obj then
-            obj:takeDamage(1, self)
+            local dmg = 0
+            if self.activeMonster then
+                dmg = self.activeMonster:calculateDamage()
+            else
+                dmg = 1
+            end
+            obj:takeDamage(dmg, self.activeMonster or self)
             return
         end
 

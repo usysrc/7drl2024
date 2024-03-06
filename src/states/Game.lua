@@ -5,7 +5,6 @@
 local Gamestate = require("libs.hump.gamestate")
 local Timer     = require("libs.hump.timer")
 local Hero      = require("src.entities.Hero")
-local Goblin    = require("src.entities.Goblin")
 local Win       = require("src.states.Win")
 local SpriteMap = require("src.entities.SpriteMap")
 local World     = require("src.entities.World")
@@ -77,6 +76,14 @@ function Game:draw()
 	for itemName, itemStack in pairs(World.hero.inventory.itemStacks) do
 		i = i + 1
 		love.graphics.print(itemName .. " x" .. itemStack.count, 0, 100 + i * 16)
+	end
+	love.graphics.print("Box: " .. #World.hero.box, love.graphics.getWidth() - 256, love.graphics.getHeight() - (96 + 16))
+
+	local i = 0
+	for mon in all(World.hero.monsters) do
+		i = i + 1
+		love.graphics.print(mon.name .. " | HP:" .. mon.hp, love.graphics.getWidth() - 256,
+			love.graphics.getHeight() - 96 + (i - 1) * 16)
 	end
 end
 

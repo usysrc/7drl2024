@@ -45,6 +45,11 @@ function rnd()
 	return math.random()
 end
 
+function append(t, v)
+	t[#t] = t[#t] .. v
+	return t
+end
+
 -- Set Library Folders
 _LIBRARYPATH = "libs"
 _LIBRARYPATH = _LIBRARYPATH .. "."
